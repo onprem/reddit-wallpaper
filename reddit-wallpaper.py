@@ -70,24 +70,24 @@ class MyFrame(wx.Frame):
         vbox.Add(subredditBox)
         vbox.Add((-1, 15))
 
-        searchBox = wx.BoxSizer(wx.HORIZONTAL)
-        searchBox.Add((25, -1))
-        searchBox.Add(wx.StaticText(self, label='containing search terms '))
-        self.searchText = wx.TextCtrl(self, value=settings['search'])
-        self.searchText.Bind(wx.EVT_TEXT, self.SetSearchText)
-        searchBox.Add(self.searchText)
-        vbox.Add(searchBox)
-        vbox.Add((-1, 15))
+        #searchBox = wx.BoxSizer(wx.HORIZONTAL)
+        #searchBox.Add((25, -1))
+        #searchBox.Add(wx.StaticText(self, label='containing search terms '))
+        #self.searchText = wx.TextCtrl(self, value=settings['search'])
+        #self.searchText.Bind(wx.EVT_TEXT, self.SetSearchText)
+        #searchBox.Add(self.searchText)
+        #vbox.Add(searchBox)
+        #vbox.Add((-1, 15))
 
-        minVoteBox = wx.BoxSizer(wx.HORIZONTAL)
-        minVoteBox.Add((25, -1))
-        minVoteBox.Add(wx.StaticText(self, label='with at least '))
-        self.minVoteSpin = wx.SpinCtrl(self, value=str(settings['minVote']), min=0, max=10000)
-        self.minVoteSpin.Bind(wx.EVT_SPINCTRL, self.SetMinVoteSpin)
-        minVoteBox.Add(self.minVoteSpin)
-        minVoteBox.Add(wx.StaticText(self, label=' upvotes'))
-        vbox.Add(minVoteBox)
-        vbox.Add((-1, 15))
+        #minVoteBox = wx.BoxSizer(wx.HORIZONTAL)
+        #minVoteBox.Add((25, -1))
+        #minVoteBox.Add(wx.StaticText(self, label='with at least '))
+        #self.minVoteSpin = wx.SpinCtrl(self, value=str(settings['minVote']), min=0, max=10000)
+        #self.minVoteSpin.Bind(wx.EVT_SPINCTRL, self.SetMinVoteSpin)
+        #minVoteBox.Add(self.minVoteSpin)
+        #minVoteBox.Add(wx.StaticText(self, label=' upvotes'))
+        #vbox.Add(minVoteBox)
+        #vbox.Add((-1, 15))
 
         fromBox = wx.BoxSizer(wx.HORIZONTAL)
         fromBox.Add((25, -1))
@@ -166,18 +166,15 @@ class MyFrame(wx.Frame):
         self.Destroy()
 
     def OnGet(self, evt):
-        if settings['select'] == 'top':
-            random = False
-        else:
-            random = True
-        GetWal(settings['subreddit'], random, settings['allowNSFW'])
+        GetWal()
 
-def get_top_image(sub_reddit, nsfw):
+def get_top_image(sub_reddit):
     """Get image link of most upvoted wallpaper of the day
     :sub_reddit: name of the sub reddit
     :return: the image link
     """
-    submissions = sub_reddit.hot(limit=10)
+    nsfw = settings['allowNSFW']
+    submissions = sub_reddit.top(settings['past'], limit=10,)
     for submission in submissions:
         ret = {"id": submission.id}
         if not nsfw and submission.over_18:
@@ -194,10 +191,13 @@ def get_top_image(sub_reddit, nsfw):
                 url = url.rsplit("/", 1)[0]
             id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
             ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
+        print("id : "),
+        print(ret['id'])
         return ret
 
-def get_random_image(sub, nsfw):
-    random_post_number = random.randint(0,20)
+def get_random_image(sub):
+    nsfw = settings['allowNSFW']
+    random_post_number = random.randint(0,19)
 
     posts = [post for post in sub.hot(limit=20)]
     submission = posts[random_post_number]
@@ -312,7 +312,13 @@ def set_wallpaper(save_location):
                                             save_location=save_location)
         os.system(command)
 
-def GetWal(subreddit, random, nsfw):
+def GetWal():
+    subreddit = settings['subreddit']
+    if settings['select'] == 'top':
+        random = False
+    else:
+        random = True
+
     save_dir = "Pictures/reddit"
 
     r = praw.Reddit(user_agent='linux:wallies-from-reddit:v0.1 by u/prmsrswt')
@@ -320,14 +326,13 @@ def GetWal(subreddit, random, nsfw):
     print('[I] fetching submissions')
     if random:
         print("[I] Aquiring random image.")
-        image = get_random_image(r.subreddit(subreddit), nsfw)
+        image = get_random_image(r.subreddit(subreddit))
     else:
         # Get top image link
         print("[I] Aquiring top image.")
-        image = get_top_image(r.subreddit(subreddit), nsfw)
+        image = get_top_image(r.subreddit(subreddit))
     if "url" not in image:
-        sys.exit("Error: No suitable images were found, the program is now" \
-                 " exiting.")
+        print("Error: No suitable images were found, please retry")
 
 
     # Get home directory and location where image will be saved
