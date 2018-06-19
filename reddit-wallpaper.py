@@ -39,7 +39,7 @@ class MyFrame(wx.Frame):
         suggested_subreddits = ['wallpapers', 'wallpaper', 'EarthPorn', 'BackgroundArt', 'TripleScreenPlus', 'quotepaper', 'BigWallpapers', 'MultiWall', 'DesktopLego', 'VideoGameWallpapers']
 
 
-        wx.Frame.__init__(self, parent, -1, "ThumbnailCtrl Demo")
+        wx.Frame.__init__(self, parent, -1, "Reddit Wallpaper", size=(400, 350))
 
         panel = wx.Panel(self)
 
@@ -70,14 +70,14 @@ class MyFrame(wx.Frame):
         vbox.Add(subredditBox)
         vbox.Add((-1, 15))
 
-        #searchBox = wx.BoxSizer(wx.HORIZONTAL)
-        #searchBox.Add((25, -1))
-        #searchBox.Add(wx.StaticText(self, label='containing search terms '))
-        #self.searchText = wx.TextCtrl(self, value=settings['search'])
-        #self.searchText.Bind(wx.EVT_TEXT, self.SetSearchText)
-        #searchBox.Add(self.searchText)
-        #vbox.Add(searchBox)
-        #vbox.Add((-1, 15))
+        searchBox = wx.BoxSizer(wx.HORIZONTAL)
+        searchBox.Add((25, -1))
+        searchBox.Add(wx.StaticText(self, label='containing search terms '))
+        self.searchText = wx.TextCtrl(self, value=settings['search'])
+        self.searchText.Bind(wx.EVT_TEXT, self.SetSearchText)
+        searchBox.Add(self.searchText)
+        vbox.Add(searchBox)
+        vbox.Add((-1, 15))
 
         #minVoteBox = wx.BoxSizer(wx.HORIZONTAL)
         #minVoteBox.Add((25, -1))
@@ -195,6 +195,33 @@ def get_top_image(sub_reddit):
         print(ret['id'])
         return ret
 
+def get_top_image_search(sub_reddit):
+    """Get image link of most upvoted wallpaper of the day
+    :sub_reddit: name of the sub reddit
+    :return: the image link
+    """
+    nsfw = settings['allowNSFW']
+    submissions = sub_reddit.search(settings['search'], sort='top', time_filter=settings['past'], limit=10,)
+    for submission in submissions:
+        ret = {"id": submission.id}
+        if not nsfw and submission.over_18:
+            continue
+        url = submission.url
+        # Strip trailing arguments (after a '?')
+        url = re.sub(R"\?.*", "", url)
+        ret['type'] = url.split(".")[-1]
+        if url.endswith(".jpg") or url.endswith(".png"):
+            ret["url"] = url
+        # Imgur support
+        if ("imgur.com" in url) and ("/a/" not in url) and ("/gallery/" not in url):
+            if url.endswith("/new"):
+                url = url.rsplit("/", 1)[0]
+            id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
+            ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
+        print("id : "),
+        print(ret['id'])
+        return ret
+
 def get_random_image(sub):
     nsfw = settings['allowNSFW']
     random_post_number = random.randint(0,19)
@@ -220,6 +247,33 @@ def get_random_image(sub):
         id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
         ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
     return ret
+
+def get_random_image_search(sub):
+    nsfw = settings['allowNSFW']
+    random_post_number = random.randint(0,19)
+
+    posts = [post for post in sub.search(settings['search'], time_filter=settings['past'], limit=20)]
+    submission = posts[random_post_number]
+
+    #if not args.nsfw and submission.over_18:
+       # continue
+    
+    ret = {"id": submission.id}
+        
+    url = submission.url
+    # Strip trailing arguments (after a '?')
+    url = re.sub(R"\?.*", "", url)
+    ret['type'] = url.split(".")[-1]
+    if url.endswith(".jpg") or url.endswith(".png"):
+        ret["url"] = url
+    # Imgur support
+    if ("imgur.com" in url) and ("/a/" not in url) and ("/gallery/" not in url):
+        if url.endswith("/new"):
+            url = url.rsplit("/", 1)[0]
+        id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
+        ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
+    return ret
+
 
 def detect_desktop_environment():
     """Get current Desktop Environment
@@ -325,12 +379,20 @@ def GetWal():
     print('[I] Connected to Reddit')
     print('[I] fetching submissions')
     if random:
-        print("[I] Aquiring random image.")
-        image = get_random_image(r.subreddit(subreddit))
+        if settings['search'] == '':
+            print("[I] Aquiring random image.")
+            image = get_random_image(r.subreddit(subreddit))
+        else:
+            print("[I] Aquiring random image with specified search term.")
+            image = get_random_image_search(r.subreddit(subreddit))
     else:
         # Get top image link
-        print("[I] Aquiring top image.")
-        image = get_top_image(r.subreddit(subreddit))
+        if settings['search'] == '':
+            print("[I] Aquiring top image.")
+            image = get_top_image(r.subreddit(subreddit))
+        else:
+            print("[I] Aquiring top image with given search parameter.")
+            image = get_top_image_search(r.subreddit(subreddit))
     if "url" not in image:
         print("Error: No suitable images were found, please retry")
 
