@@ -1,0 +1,6 @@
+wxpython
+decorator
+future
+praw
+requests
+six
