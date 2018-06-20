@@ -39,65 +39,37 @@ class MyFrame(wx.Frame):
         suggested_subreddits = ['wallpapers', 'wallpaper', 'EarthPorn', 'BackgroundArt', 'TripleScreenPlus', 'quotepaper', 'BigWallpapers', 'MultiWall', 'DesktopLego', 'VideoGameWallpapers']
 
 
-        wx.Frame.__init__(self, parent, -1, "Reddit Wallpaper", size=(400, 350))
+        wx.Frame.__init__(self, parent, -1, "Reddit Wallpaper", size=(400, 315))
 
         panel = wx.Panel(self)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        vbox.Add(((-1, 10)))
+        fgs = wx.FlexGridSizer(5, 2, 9, 25)
 
-        selectBox = wx.BoxSizer(wx.HORIZONTAL)
-        selectBox.Add((10, -1))
-        selectBox.Add(wx.StaticText(self, label='Select '))
-        self.selectCombo = wx.ComboBox(self, value=settings['select'], choices=select, style=wx.CB_READONLY)
-        self.selectCombo.Bind(wx.EVT_TEXT, self.SetSelectCombo)
-        self.selectCombo.Bind(wx.EVT_COMBOBOX, self.SetSelectCombo)
-        selectBox.Add(self.selectCombo)
-        selectBox.Add(wx.StaticText(self, label=' wallpapers...'))
-        vbox.Add(selectBox)
-
-        vbox.Add((-1, 15))
-
-        subredditBox = wx.BoxSizer(wx.HORIZONTAL)
-        subredditBox.Add((25, -1))
-        subredditBox.Add(wx.StaticText(self, label='from the '))
+        sub_tc = wx.StaticText(self, label='Subreddits ')
         self.subredditCombo = wx.ComboBox(self, value=settings['subreddit'], choices=suggested_subreddits)
         self.subredditCombo.Bind(wx.EVT_TEXT, self.SetSubredditCombo)
         self.subredditCombo.Bind(wx.EVT_COMBOBOX, self.SetSubredditCombo)
-        subredditBox.Add(self.subredditCombo)
-        subredditBox.Add(wx.StaticText(self, label=' subreddit'))
-        vbox.Add(subredditBox)
-        vbox.Add((-1, 15))
 
-        searchBox = wx.BoxSizer(wx.HORIZONTAL)
-        searchBox.Add((25, -1))
-        searchBox.Add(wx.StaticText(self, label='containing search terms '))
+        sel_tc = wx.StaticText(self, label='Select ')
+        self.selectCombo = wx.ComboBox(self, value=settings['select'], choices=select, style=wx.CB_READONLY)
+        self.selectCombo.Bind(wx.EVT_TEXT, self.SetSelectCombo)
+        self.selectCombo.Bind(wx.EVT_COMBOBOX, self.SetSelectCombo)
+
+        search_tc = wx.StaticText(self, label='Search ')
         self.searchText = wx.TextCtrl(self, value=settings['search'])
         self.searchText.Bind(wx.EVT_TEXT, self.SetSearchText)
-        searchBox.Add(self.searchText)
-        vbox.Add(searchBox)
-        vbox.Add((-1, 15))
 
-        #minVoteBox = wx.BoxSizer(wx.HORIZONTAL)
-        #minVoteBox.Add((25, -1))
-        #minVoteBox.Add(wx.StaticText(self, label='with at least '))
+        #minv_tc = wx.StaticText(self, label='with at least ')
         #self.minVoteSpin = wx.SpinCtrl(self, value=str(settings['minVote']), min=0, max=10000)
         #self.minVoteSpin.Bind(wx.EVT_SPINCTRL, self.SetMinVoteSpin)
-        #minVoteBox.Add(self.minVoteSpin)
-        #minVoteBox.Add(wx.StaticText(self, label=' upvotes'))
-        #vbox.Add(minVoteBox)
-        #vbox.Add((-1, 15))
 
-        fromBox = wx.BoxSizer(wx.HORIZONTAL)
-        fromBox.Add((25, -1))
-        fromBox.Add(wx.StaticText(self, label='from the past '))
+        time_tc = wx.StaticText(self, label='Time ')
         self.pastCombo = wx.ComboBox(self, choices=pasts, value=settings['past'], style=wx.CB_READONLY)
         self.pastCombo.Bind(wx.EVT_TEXT, self.SetPastCombo)
         self.pastCombo.Bind(wx.EVT_COMBOBOX, self.SetPastCombo)
-        fromBox.Add(self.pastCombo)
-        vbox.Add(fromBox)
-        vbox.Add((-1, 15))
+
 
         #intervalBox = wx.BoxSizer(wx.HORIZONTAL)
         #intervalBox.Add(wx.StaticText(self, label='and update the wallpaper every '))
@@ -108,14 +80,16 @@ class MyFrame(wx.Frame):
         #vbox.Add(intervalBox)
         #vbox.Add((-1, 15))
 
-        nsfwBox = wx.BoxSizer(wx.HORIZONTAL)
-        nsfwBox.Add((25, -1))
         self.nsfwCheck = wx.CheckBox(self, label='Allowing NSFW wallpapers?')
         self.nsfwCheck.SetValue(settings['allowNSFW'])
         self.nsfwCheck.Bind(wx.EVT_CHECKBOX, self.SetNSFWCheck)
-        nsfwBox.Add(self.nsfwCheck)
-        vbox.Add(nsfwBox)
-        vbox.Add((-1, 15))
+
+        fgs.AddMany([(sub_tc), (self.subredditCombo, 1, wx.EXPAND), (sel_tc), (self.selectCombo, 1, wx.EXPAND), (search_tc), (self.searchText, 1, wx.EXPAND), (time_tc), (self.pastCombo, 1, wx.EXPAND), (wx.StaticText(self)), (self.nsfwCheck, 1, wx.EXPAND)])
+
+        fgs.AddGrowableRow(2, 1)
+        fgs.AddGrowableCol(1, 1)
+
+        vbox.Add(fgs, proportion=1, flag=wx.ALL|wx.EXPAND, border=15)
 
         vbox.Add((-1, 10))
         vbox.Add(wx.StaticLine(self), 0, wx.EXPAND)
