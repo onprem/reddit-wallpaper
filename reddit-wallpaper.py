@@ -342,7 +342,7 @@ def GetWal():
 
     save_dir = "Pictures/reddit"
 
-    r = praw.Reddit(user_agent='linux:wallies-from-reddit:v0.1 by u/prmsrswt', client_id='h-SV78cthwg-MA', client_secret='gGUTvSpGWi6qDz-lBXYKyjU-FYE')
+    r = praw.Reddit(user_agent='linux:wallies-from-reddit:v0.1 by u/prmsrswt')
     print('[I] Connected to Reddit')
     print('[I] fetching submissions')
     if random:
