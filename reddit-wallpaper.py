@@ -109,31 +109,24 @@ class MyFrame(wx.Frame):
 
     def SetIntervalSpin(self, evt):
         settings['interval'] = self.intervalSpin.GetValue()
-        self.OnUpdateInterval()
 
     def SetNSFWCheck(self, evt):
         settings['allowNSFW'] = self.nsfwCheck.IsChecked()
-        self.OnFilterUpdate()
 
     def SetPastCombo(self, evt):
         settings['past'] = self.pastCombo.GetValue()
-        self.OnFilterUpdate()
 
     def SetMinVoteSpin(self, evt):
         settings['minVote'] = self.minVoteSpin.GetValue()
-        self.OnFilterUpdate()
 
     def SetSearchText(self, evt):
         settings['search'] = self.searchText.GetValue()
-        self.OnFilterUpdate()
 
     def SetSubredditCombo(self, evt):
         settings['subreddit'] = self.subredditCombo.GetValue()
-        self.OnFilterUpdate()
 
     def SetSelectCombo(self, evt):
         settings['select'] = self.selectCombo.GetValue()
-        self.OnFilterUpdate()
 
     def OnClose(self, evt):
         self.SaveSettings()
@@ -165,8 +158,7 @@ def get_top_image(sub_reddit):
                 url = url.rsplit("/", 1)[0]
             id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
             ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
-        print("id : "),
-        print(ret['id'])
+        print("id :", ret['id'])
         return ret
 
 def get_top_image_search(sub_reddit):
@@ -175,7 +167,7 @@ def get_top_image_search(sub_reddit):
     :return: the image link
     """
     nsfw = settings['allowNSFW']
-    submissions = sub_reddit.search(settings['search'], sort='top', time_filter=settings['past'], limit=10,)
+    submissions = sub_reddit.search(settings['search'], sort='relevance', time_filter=settings['past'], limit=10,)
     for submission in submissions:
         ret = {"id": submission.id}
         if not nsfw and submission.over_18:
@@ -192,8 +184,7 @@ def get_top_image_search(sub_reddit):
                 url = url.rsplit("/", 1)[0]
             id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
             ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
-        print("id : "),
-        print(ret['id'])
+        print("id :", ret['id'])
         return ret
 
 def get_random_image(sub):
@@ -220,6 +211,7 @@ def get_random_image(sub):
             url = url.rsplit("/", 1)[0]
         id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
         ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
+    print("id :", ret['id'])
     return ret
 
 def get_random_image_search(sub):
@@ -246,6 +238,7 @@ def get_random_image_search(sub):
             url = url.rsplit("/", 1)[0]
         id = url.rsplit("/", 1)[1].rsplit(".", 1)[0]
         ret["url"] = "http://i.imgur.com/{id}.jpg".format(id=id)
+    print("id :", ret['id'])
     return ret
 
 
@@ -349,7 +342,7 @@ def GetWal():
 
     save_dir = "Pictures/reddit"
 
-    r = praw.Reddit(user_agent='linux:wallies-from-reddit:v0.1 by u/prmsrswt')
+    r = praw.Reddit(user_agent='linux:wallies-from-reddit:v0.1 by u/prmsrswt', client_id='h-SV78cthwg-MA', client_secret='gGUTvSpGWi6qDz-lBXYKyjU-FYE')
     print('[I] Connected to Reddit')
     print('[I] fetching submissions')
     if random:
