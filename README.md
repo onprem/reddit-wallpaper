@@ -16,9 +16,11 @@
 - Create a praw.ini file in `~/.config/praw.ini`
 - put your client id and client secret in it
     - The syntax would be
-   ` [DEFAULT]`
-   ` client_id=<your-client-id>`
-    `client_secret=<your-cliet-secret>`
+    ```ini
+    [DEFAULT]
+    client_id=<your-client-id>
+    client_secret=<your-cliet-secret>
+    ```
     
 
 ## Usage
