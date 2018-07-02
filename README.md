@@ -8,7 +8,7 @@
 ## Requirements
 - python
 - pip
-- a reddit developer app. Go to https://www.reddit.com/pref/apps and create a new app.
+- a reddit developer app. Go to https://www.reddit.com/prefs/apps and create a new app.
 
 ## Installation
 - clone this repo `git clone https://github.com/prmsrswt/reddit-wallpaper.git && cd reddit-wallpaper`
