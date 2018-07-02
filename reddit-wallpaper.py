@@ -18,13 +18,13 @@ else:
     import subprocess
 
 default_settings = dict(
-	#interval = 24,
 	minVote = 0,
 	subreddit = 'wallpapers',
 	search = '',
-	past = 'day',
+	past = 'all',
 	allowNSFW = False,
-	select = 'top'
+	select = 'top',
+    save_dir = 'Pictures/reddit'
 )
 
 settings = default_settings
@@ -45,7 +45,7 @@ class MyFrame(wx.Frame):
 
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        fgs = wx.FlexGridSizer(5, 2, 9, 25)
+        fgs = wx.FlexGridSizer(6, 2, 9, 25)
 
         sub_tc = wx.StaticText(self, label='Subreddits ')
         self.subredditCombo = wx.ComboBox(self, value=settings['subreddit'], choices=suggested_subreddits)
@@ -61,30 +61,20 @@ class MyFrame(wx.Frame):
         self.searchText = wx.TextCtrl(self, value=settings['search'])
         self.searchText.Bind(wx.EVT_TEXT, self.SetSearchText)
 
-        #minv_tc = wx.StaticText(self, label='with at least ')
-        #self.minVoteSpin = wx.SpinCtrl(self, value=str(settings['minVote']), min=0, max=10000)
-        #self.minVoteSpin.Bind(wx.EVT_SPINCTRL, self.SetMinVoteSpin)
-
         time_tc = wx.StaticText(self, label='Time ')
         self.pastCombo = wx.ComboBox(self, choices=pasts, value=settings['past'], style=wx.CB_READONLY)
         self.pastCombo.Bind(wx.EVT_TEXT, self.SetPastCombo)
         self.pastCombo.Bind(wx.EVT_COMBOBOX, self.SetPastCombo)
 
-
-        #intervalBox = wx.BoxSizer(wx.HORIZONTAL)
-        #intervalBox.Add(wx.StaticText(self, label='and update the wallpaper every '))
-        #self.intervalSpin = wx.SpinCtrl(self, value=str(settings['interval']), min=1)
-        #self.intervalSpin.Bind(wx.EVT_SPINCTRL, self.SetIntervalSpin)
-        #intervalBox.Add(self.intervalSpin)
-        #intervalBox.Add(wx.StaticText(self, label=' hours.'))
-        #vbox.Add(intervalBox)
-        #vbox.Add((-1, 15))
+        dir_tc = wx.StaticText(self, label='Save in ')
+        self.saveDir = wx.TextCtrl(self, value=settings['save_dir'])
+        self.saveDir.Bind(wx.EVT_TEXT, self.SetSaveDir)
 
         self.nsfwCheck = wx.CheckBox(self, label='Allowing NSFW wallpapers?')
         self.nsfwCheck.SetValue(settings['allowNSFW'])
         self.nsfwCheck.Bind(wx.EVT_CHECKBOX, self.SetNSFWCheck)
 
-        fgs.AddMany([(sub_tc), (self.subredditCombo, 1, wx.EXPAND), (sel_tc), (self.selectCombo, 1, wx.EXPAND), (search_tc), (self.searchText, 1, wx.EXPAND), (time_tc), (self.pastCombo, 1, wx.EXPAND), (wx.StaticText(self)), (self.nsfwCheck, 1, wx.EXPAND)])
+        fgs.AddMany([(sub_tc), (self.subredditCombo, 1, wx.EXPAND), (sel_tc), (self.selectCombo, 1, wx.EXPAND), (search_tc), (self.searchText, 1, wx.EXPAND), (dir_tc), (self.saveDir, 1, wx.EXPAND), (time_tc), (self.pastCombo, 1, wx.EXPAND), (wx.StaticText(self)), (self.nsfwCheck, 1, wx.EXPAND)])
 
         fgs.AddGrowableRow(2, 1)
         fgs.AddGrowableCol(1, 1)
@@ -121,6 +111,9 @@ class MyFrame(wx.Frame):
 
     def SetSearchText(self, evt):
         settings['search'] = self.searchText.GetValue()
+    
+    def SetSaveDir(self, evt):
+        settings['save_dir'] = self.saveDir.GetValue()
 
     def SetSubredditCombo(self, evt):
         settings['subreddit'] = self.subredditCombo.GetValue()
@@ -189,13 +182,14 @@ def get_top_image_search(sub_reddit):
 
 def get_random_image(sub):
     nsfw = settings['allowNSFW']
-    random_post_number = random.randint(0,19)
+    random_post_number = random.randint(0,10)
 
-    posts = [post for post in sub.hot(limit=20)]
+    posts = [post for post in sub.hot(limit=12)]
     submission = posts[random_post_number]
 
-    #if not args.nsfw and submission.over_18:
-       # continue
+    if not args.nsfw and submission.over_18:
+       ret = get_random_image(sub)
+       return ret
     
     ret = {"id": submission.id}
         
@@ -216,13 +210,14 @@ def get_random_image(sub):
 
 def get_random_image_search(sub):
     nsfw = settings['allowNSFW']
-    random_post_number = random.randint(0,19)
+    random_post_number = random.randint(0,10)
 
-    posts = [post for post in sub.search(settings['search'], time_filter=settings['past'], limit=20)]
+    posts = [post for post in sub.search(settings['search'], time_filter=settings['past'], limit=12)]
     submission = posts[random_post_number]
 
-    #if not args.nsfw and submission.over_18:
-       # continue
+    if not args.nsfw and submission.over_18:
+       ret = get_random_image(sub)
+       return ret
     
     ret = {"id": submission.id}
         
@@ -340,7 +335,6 @@ def GetWal():
     else:
         random = True
 
-    save_dir = "Pictures/reddit"
 
     r = praw.Reddit(user_agent='linux:wallies-from-reddit:v0.1 by u/prmsrswt')
     print('[I] Connected to Reddit')
@@ -367,7 +361,7 @@ def GetWal():
     # Get home directory and location where image will be saved
     # (default location for Ubuntu is used)
     home_dir = os.path.expanduser("~")
-    save_location = "{home_dir}/{save_dir}/{subreddit}-{id}.{image_type}".format(home_dir=home_dir, save_dir=save_dir,
+    save_location = "{home_dir}/{save_dir}/{subreddit}-{id}.{image_type}".format(home_dir=home_dir, save_dir=settings['save_dir'],
                                                                         subreddit=subreddit,
                                                                         id=image["id"],
                                                                         image_type=image['type'])
