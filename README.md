@@ -2,7 +2,7 @@
 
 ### A tool to download and set wallpapers from different Subreddits of Reddit
 
-![GIF demo] (https://i.imgur.com/OegRSRd.gif)
+![GIF demo](https://raw.githubusercontent.com/prmsrswt/reddit-wallpaper/master/outa.gif)
 [**Youtube mirror of demo**](https://youtu.be/XNjiX8mj3uo) 
 
 ## Requirements
