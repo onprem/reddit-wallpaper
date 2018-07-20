@@ -8,7 +8,7 @@
 ## Requirements
 - python
 - pip
-- a reddit developer app. Go to https://www.reddit.com/pref/apps and create a new app.
+- a reddit developer app. Go to https://www.reddit.com/prefs/apps and create a new app.
 
 ## Installation
 - clone this repo `git clone https://github.com/prmsrswt/reddit-wallpaper.git && cd reddit-wallpaper`
@@ -16,9 +16,11 @@
 - Create a praw.ini file in `~/.config/praw.ini`
 - put your client id and client secret in it
     - The syntax would be
-   ` [DEFAULT]`
-   ` client_id=<your-client-id>`
-    `client_secret=<your-cliet-secret>`
+    ```ini
+    [DEFAULT]
+    client_id=<your-client-id>
+    client_secret=<your-cliet-secret>
+    ```
     
 
 ## Usage
