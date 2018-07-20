@@ -39,7 +39,7 @@ class MyFrame(wx.Frame):
         suggested_subreddits = ['wallpapers', 'wallpaper', 'EarthPorn', 'BackgroundArt', 'TripleScreenPlus', 'quotepaper', 'BigWallpapers', 'MultiWall', 'DesktopLego', 'VideoGameWallpapers']
 
 
-        wx.Frame.__init__(self, parent, -1, "Reddit Wallpaper", size=(400, 315))
+        wx.Frame.__init__(self, parent, -1, "Reddit Wallpaper", size=(400, 360))
 
         panel = wx.Panel(self)
 
@@ -187,7 +187,7 @@ def get_random_image(sub):
     posts = [post for post in sub.hot(limit=12)]
     submission = posts[random_post_number]
 
-    if not args.nsfw and submission.over_18:
+    if not nsfw and submission.over_18:
        ret = get_random_image(sub)
        return ret
     
@@ -215,7 +215,7 @@ def get_random_image_search(sub):
     posts = [post for post in sub.search(settings['search'], time_filter=settings['past'], limit=12)]
     submission = posts[random_post_number]
 
-    if not args.nsfw and submission.over_18:
+    if not nsfw and submission.over_18:
        ret = get_random_image(sub)
        return ret
     
